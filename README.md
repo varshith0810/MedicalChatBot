@@ -1,1 +1,1 @@
-MEDICAL-CHATBOT-WITH-LLMS-LangChain-Pinecone-Flask-AWS
+MEDICAL-CHATBOT-WITH-LLMs-LangChain-Pinecone-Flask-AWS
