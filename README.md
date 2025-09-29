@@ -11,9 +11,12 @@ conda create -n medibot python=3.10 -y
 '''bash
 conda activate medibot
 '''
+
+
 '''
 using google colab(no need of the conda envi)
 '''
+
 ### Step-2  install requirements
 '''bash
 pip install -r requirements.txt
