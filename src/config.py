@@ -17,8 +17,9 @@ DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 DEFAULT_EMBEDDING_DIM = 384
 DEFAULT_CHUNK_SIZE = 500
 DEFAULT_CHUNK_OVERLAP = 50
-
-
+DEFAULT_RETRIEVAL_K = 3
+DEFAULT_LLM_BASE_URL = "https://integrate.api.nvidia.com/v1"
+DEFAULT_LLM_MODEL = "writer/palmyra-med-70b-32k"
 @dataclass(frozen=True)
 class Settings:
     """Runtime settings for ingestion and retrieval components."""
@@ -31,6 +32,9 @@ class Settings:
     embedding_dim: int = DEFAULT_EMBEDDING_DIM
     chunk_size: int = DEFAULT_CHUNK_SIZE
     chunk_overlap: int = DEFAULT_CHUNK_OVERLAP
+    retrieval_k: int = DEFAULT_RETRIEVAL_K
+    llm_base_url: str = DEFAULT_LLM_BASE_URL
+    llm_model: str = DEFAULT_LLM_MODEL
 
 
 def _int_from_env(name: str, default: int) -> int:
@@ -60,4 +64,8 @@ def load_settings(env_file: str | os.PathLike[str] | None = ".env") -> Settings:
         embedding_dim=_int_from_env("EMBEDDING_DIM", DEFAULT_EMBEDDING_DIM),
         chunk_size=_int_from_env("CHUNK_SIZE", DEFAULT_CHUNK_SIZE),
         chunk_overlap=_int_from_env("CHUNK_OVERLAP", DEFAULT_CHUNK_OVERLAP),
+        retrieval_k=_int_from_env("RETRIEVAL_K", DEFAULT_RETRIEVAL_K),
+        llm_base_url=os.getenv("LLM_BASE_URL", DEFAULT_LLM_BASE_URL),
+        llm_model=os.getenv("LLM_MODEL", DEFAULT_LLM_MODEL),
+
     )

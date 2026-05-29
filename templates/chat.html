@@ -1,81 +1,201 @@
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Chatbot</title>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
-	</head>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="MedicalChatBot answers questions from an indexed medical-book knowledge base."
+    />
+    <title>MedicalChatBot | Health Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel" aria-labelledby="hero-title">
+        <nav class="brand" aria-label="Product">
+          <div class="brand-mark" aria-hidden="true">
+            <span class="pulse-dot"></span>
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M10.6 3.5h2.8v6.1h6.1v2.8h-6.1v6.1h-2.8v-6.1H4.5V9.6h6.1V3.5Z" />
+            </svg>
+          </div>
+          <span>MedicalChatBot</span>
+        </nav>
 
+        <div class="hero-copy">
+          <p class="eyebrow">Evidence-aware medical book assistant</p>
+          <h1 id="hero-title">Ask focused health questions with calm, guided support.</h1>
+          <p class="hero-description">
+            Search your ingested medical library with retrieval-augmented answers, clear context,
+            and a patient-first interface built for quick conversations.
+          </p>
+        </div>
 
-	<body>
-		<div class="container-fluid h-100">
-			<div class="row justify-content-center h-100">
-				<div class="col-md-8 col-xl-6 chat">
-					<div class="card">
-						<div class="card-header msg_head">
-							<div class="d-flex bd-highlight">
-								<div class="img_cont">
-									<img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img">
-									<!-- <img src="https://www.prdistribution.com/spirit/uploads/pressreleases/2019/newsreleases/d83341deb75c4c4f6b113f27b1e42cd8-chatbot-florence-already-helps-thousands-of-patients-to-remember-their-medication.png" class="rounded-circle user_img"> -->
-									<span class="online_icon"></span>
-								</div>
-								<div class="user_info">
-									<span>Medical Chatbot</span>
-									<p>Ask me anything!</p>
-								</div>
-							</div>
-						</div>
-						<div id="messageFormeight" class="card-body msg_card_body">
+        <div class="trust-grid" aria-label="Assistant qualities">
+          <article>
+            <strong>RAG backed</strong>
+            <span>Answers use your Qdrant-indexed medical content.</span>
+          </article>
+          <article>
+            <strong>Fast triage</strong>
+            <span>Designed for concise, readable next-step guidance.</span>
+          </article>
+          <article>
+            <strong>Safe reminder</strong>
+            <span>Not a substitute for emergency or clinician care.</span>
+          </article>
+        </div>
+      </section>
 
+      <section class="chat-panel" aria-label="Medical chatbot conversation">
+        <header class="chat-header">
+          <div class="clinician-avatar" aria-hidden="true">
+            <span>+</span>
+          </div>
+          <div>
+            <p class="assistant-label">AI Medical Assistant</p>
+            <h2>How can I help today?</h2>
+          </div>
+          <div class="status-pill" title="Application is ready">
+            <span></span>
+            Online
+          </div>
+        </header>
 
-						</div>
-						<div class="card-footer">
-							<form id="messageArea" class="input-group">
-                                <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
-								<div class="input-group-append">
-									<button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
-								</div>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+        <div class="safety-note" role="note">
+          <strong>Important:</strong> For chest pain, severe breathing trouble, stroke symptoms,
+          or other emergencies, call local emergency services immediately.
+        </div>
 
-		<script>
-			$(document).ready(function() {
-				$("#messageArea").on("submit", function(event) {
-					const date = new Date();
-					const hour = date.getHours();
-					const minute = date.getMinutes();
-					const str_time = hour+":"+minute;
-					var rawText = $("#text").val();
+        <div id="messages" class="messages" aria-live="polite" aria-label="Chat messages">
+          <article class="message bot-message">
+            <div class="message-avatar" aria-hidden="true">MC</div>
+            <div class="bubble">
+              <p>
+                Hi, I’m ready to answer questions from the medical knowledge base. Try asking
+                about symptoms, conditions, medications, prevention, or when to seek care.
+              </p>
+              <time>Ready now</time>
+            </div>
+          </article>
+        </div>
 
-					var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">'+ str_time + '</span></div><div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div></div>';
+        <div class="prompt-chips" aria-label="Example prompts">
+          <button type="button" data-prompt="What are common warning signs of dehydration?">
+            Dehydration signs
+          </button>
+          <button type="button" data-prompt="Explain hypertension in simple terms.">
+            Hypertension basics
+          </button>
+          <button type="button" data-prompt="When should a fever need urgent care?">
+            Fever urgency
+          </button>
+        </div>
 
-					$("#text").val("");
-					$("#messageFormeight").append(userHtml);
+        <form id="message-form" class="composer" autocomplete="off">
+          <label class="sr-only" for="message-input">Ask a medical question</label>
+          <textarea
+            id="message-input"
+            name="msg"
+            rows="1"
+            placeholder="Ask a medical question..."
+            required
+          ></textarea>
+          <button type="submit" aria-label="Send message">
+            <span>Send</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3.4 20.4 17.2-8.4L3.4 3.6l.1 6.5 10.1 1.9-10.1 1.9-.1 6.5Z" />
+            </svg>
+          </button>
+        </form>
+      </section>
+    </main>
 
-					$.ajax({
-						data: {
-							msg: rawText,
-						},
-						type: "POST",
-						url: "/get",
-					}).done(function(data) {
-						var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
-						$("#messageFormeight").append($.parseHTML(botHtml));
-					});
-					event.preventDefault();
-				});
-			});
-		</script>
+    <script>
+      const form = document.querySelector("#message-form");
+      const input = document.querySelector("#message-input");
+      const messages = document.querySelector("#messages");
+      const chips = document.querySelectorAll("[data-prompt]");
 
-    </body>
+      const escapeHtml = (value) =>
+        value.replace(/[&<>'"]/g, (char) =>
+          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char])
+        );
+
+      const now = () =>
+        new Intl.DateTimeFormat([], { hour: "2-digit", minute: "2-digit" }).format(new Date());
+
+      function appendMessage(text, sender, loading = false) {
+        const article = document.createElement("article");
+        article.className = `message ${sender === "user" ? "user-message" : "bot-message"}`;
+        if (loading) article.dataset.loading = "true";
+        const avatar = sender === "user" ? "You" : "MC";
+        article.innerHTML = `
+          <div class="message-avatar" aria-hidden="true">${avatar}</div>
+          <div class="bubble">
+            <p>${loading ? '<span class="typing"><i></i><i></i><i></i></span>' : escapeHtml(text)}</p>
+            <time>${now()}</time>
+          </div>
+        `;
+        messages.appendChild(article);
+        messages.scrollTop = messages.scrollHeight;
+        return article;
+      }
+
+      async function sendMessage(rawText) {
+        const text = rawText.trim();
+        if (!text) return;
+        appendMessage(text, "user");
+        input.value = "";
+        input.style.height = "auto";
+        const loadingMessage = appendMessage("", "bot", true);
+
+        try {
+          const formData = new FormData();
+          formData.append("msg", text);
+          const response = await fetch("/get", { method: "POST", body: formData });
+          const data = await response.text();
+          loadingMessage.remove();
+          appendMessage(data || "I could not generate a response. Please try again.", "bot");
+        } catch (error) {
+          loadingMessage.remove();
+          appendMessage(
+            "I could not reach the assistant service. Please check the deployment logs and try again.",
+            "bot"
+          );
+        }
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        sendMessage(input.value);
+      });
+
+      input.addEventListener("input", () => {
+        input.style.height = "auto";
+        input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+      });
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
+
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          input.value = chip.dataset.prompt;
+          input.focus();
+        });
+      });
+    </script>
+  </body>
 </html>
