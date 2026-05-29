@@ -20,8 +20,6 @@ DEFAULT_CHUNK_OVERLAP = 50
 DEFAULT_RETRIEVAL_K = 3
 DEFAULT_LLM_BASE_URL = "https://integrate.api.nvidia.com/v1"
 DEFAULT_LLM_MODEL = "writer/palmyra-med-70b-32k"
-
-
 @dataclass(frozen=True)
 class Settings:
     """Runtime settings for ingestion and retrieval components."""
@@ -69,4 +67,5 @@ def load_settings(env_file: str | os.PathLike[str] | None = ".env") -> Settings:
         retrieval_k=_int_from_env("RETRIEVAL_K", DEFAULT_RETRIEVAL_K),
         llm_base_url=os.getenv("LLM_BASE_URL", DEFAULT_LLM_BASE_URL),
         llm_model=os.getenv("LLM_MODEL", DEFAULT_LLM_MODEL),
+
     )
