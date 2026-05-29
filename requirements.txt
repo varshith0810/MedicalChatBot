@@ -2,9 +2,10 @@ langchain==0.3.26
 flask==3.1.1
 sentence-transformers==4.1.0
 pypdf==5.6.1
+qdrant-client==1.14.3
 python-dotenv==1.1.0
-langchain-pinecone==0.2.8
 langchain-openai==0.3.24
 langchain-community==0.3.26
+langchain-qdrant==0.2.0
 langchain-google-genai==2.1.11
 -e .
