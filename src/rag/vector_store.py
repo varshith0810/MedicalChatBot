@@ -1,23 +1,20 @@
 """Qdrant vector-store integration."""
-
 from __future__ import annotations
-
 from dataclasses import dataclass
-
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
-
-
 @dataclass(frozen=True)
 class VectorRecord:
     id: str
     vector: list[float]
     payload: dict
 
-
 class QdrantVectorStore:
     """Small Qdrant adapter for creating collections and upserting chunks."""
-
+    def __init__(
+        self, *, url: str, collection_name: str, vector_size: int, api_key: str | None = None
+    ):
+        self.client = QdrantClient(url=url, api_key=api_key or None)
     def __init__(self, *, url: str, collection_name: str, vector_size: int):
         self.client = QdrantClient(url=url)
         self.collection_name = collection_name
