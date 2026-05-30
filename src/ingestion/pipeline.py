@@ -51,7 +51,6 @@ class IngestionPipeline:
             vector_size=settings.embedding_dim,
             api_key=settings.qdrant_api_key,
         )
-
     def run(self) -> IngestionStats:
         stats = IngestionStats()
         books = load_books(self.settings.data_dir)

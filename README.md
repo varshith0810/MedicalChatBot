@@ -17,11 +17,37 @@ conda create -n medibot python=3.10 -y
 conda activate medibot
 pip install -r requirements.txt
 cp .env.example .env
-```
 
 Update `.env` with your model/API settings. For the included NVIDIA-hosted model, set `NVIDIA_API_KEY`.
 
 The default NVIDIA LLM is now `nvidia/llama-3.3-nemotron-super-49b-v1.5`, a newer Nemotron chat/reasoning model that is better suited for RAG-style medical-book Q&A than the previous Palmyra default.
+
+## Start Qdrant locally
+
+```bash
+docker compose up -d qdrant
+```
+
+## Add books
+
+Place PDF files in:
+
+```text
+data/books/
+```
+
+If you already have PDFs in `data/`, either move them into `data/books/` or set `DATA_DIR=data` in `.env`.
+
+## Ingest books
+
+```bash
+python scripts/ingest_books.py
+```
+
+The pipeline loads PDFs, cleans text, chunks pages, deduplicates chunks, stores metadata in SQLite, and upserts vectors into Qdrant.
+```
+
+Update `.env` with your model/API settings. For the included NVIDIA-hosted model, set `NVIDIA_API_KEY`.
 
 ## Start Qdrant locally
 
@@ -52,7 +78,6 @@ The pipeline loads PDFs, cleans text, chunks pages, deduplicates chunks, stores 
 ```bash
 python app.py
 ```
-
 Open <http://localhost:5000>.
 
 ## Render deployment
@@ -75,7 +100,18 @@ High-level flow:
 6. In Render, create a Blueprint from `render.yaml` or manually create a Python Web Service.
 7. Add the prompted secrets and deploy.
 8. Verify `/healthz`, then ask a question in the UI.
+Open <http://localhost:5000>.
 
+## Render deployment
+
+This repository includes `render.yaml` for Render Blueprint deployment.
+
+1. Push the repository to GitHub/GitLab.
+2. In Render, create a new Blueprint from the repository.
+3. Provide the required secret values when prompted:
+   - `QDRANT_URL` - use a managed Qdrant Cloud URL or another reachable Qdrant endpoint.
+   - `NVIDIA_API_KEY` - used by the configured NVIDIA-compatible OpenAI endpoint.
+4. Deploy the service.
 Render runs:
 
 ```bash
