@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: medical-chatbot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.13
+      - key: DATA_DIR
+        value: data/books
+      - key: SQLITE_DB_PATH
+        value: /opt/render/project/src/data/medical_chatbot.sqlite3
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_COLLECTION
+        value: medical_books
+      - key: EMBEDDING_MODEL
+        value: BAAI/bge-small-en-v1.5
+      - key: EMBEDDING_DIM
+        value: 384
+      - key: CHUNK_SIZE
+        value: 500
+      - key: CHUNK_OVERLAP
+        value: 50
+      - key: RETRIEVAL_K
+        value: 3
+      - key: LLM_BASE_URL
+        value: https://integrate.api.nvidia.com/v1
+      - key: LLM_MODEL
+        value: writer/palmyra-med-70b-32k
+      - key: NVIDIA_API_KEY
+        sync: false

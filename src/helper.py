@@ -47,7 +47,7 @@ def download_embeddings():
   """
   Download and retrun the HuggingFace embeddings model'
   """
-  model_name = "sentence-transformers/all-MiniLM-L6-v2"
+  model_name = "BAAI/bge-small-en-v1.5"
   embeddings = HuggingFaceEmbeddings(
       model_name=model_name
   )

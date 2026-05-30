@@ -1,78 +1,89 @@
-from flask import Flask, render_template, jsonify, request
-from src.helper import download_embeddings
-from langchain_pinecone import PineconeVectorStore
-from langchain_openai import ChatOpenAI
+import os
+from functools import lru_cache
+
+from dotenv import load_dotenv
+from flask import Flask, jsonify, render_template, request
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
-from dotenv import load_dotenv
-from src.prompt import *
-import os
+from langchain_openai import ChatOpenAI
+from langchain_qdrant import QdrantVectorStore
 
-
-app = Flask(__name__)
+from src.config import load_settings
+from src.helper import download_embeddings
+from src.prompt import system_prompt
 
 
 load_dotenv()
-
-PINECONE_API_KEY=os.environ.get('PINECONE_API_KEY')
-OPENAI_API_KEY=os.environ.get('OPENAI_API_KEY')
-
-os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+app = Flask(__name__)
 
 
-embeddings = download_embeddings()
+@lru_cache(maxsize=1)
+def get_rag_chain():
+    """Build the retrieval chain lazily so Render health checks stay lightweight."""
 
-index_name = "medical-chatbot" 
-# Embed each chunk and upsert the embeddings into your Pinecone index.
-docsearch = PineconeVectorStore.from_existing_index(
-    index_name=index_name,
-    embedding=embeddings
-)
+    settings = load_settings()
+    api_key = os.environ.get("OPENAI_API_KEY") or os.environ.get("NVIDIA_API_KEY")
+    if api_key:
+        os.environ["OPENAI_API_KEY"] = api_key
 
+    embeddings = download_embeddings()
+    docsearch = QdrantVectorStore.from_existing_collection(
+        embedding=embeddings,
+        collection_name=settings.qdrant_collection,
+        url=settings.qdrant_url,
+        api_key=settings.qdrant_api_key or None,
+    )
+    retriever = docsearch.as_retriever(
+        search_type="similarity", search_kwargs={"k": settings.retrieval_k}
+    )
 
-
-
-retriever = docsearch.as_retriever(search_type="similarity", search_kwargs={"k":3})
-
-chatModel = ChatOpenAI(
-    base_url = "https://integrate.api.nvidia.com/v1",
-    # Set the base_url to use the NVIDIA API
-    model="writer/palmyra-med-70b-32k",
-    temperature=0.2,
-    top_p=0.7,
-    max_tokens=32000
-
-)
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_prompt),
-        ("human", "{input}")
-    ]
-)
-
-question_answer_chain = create_stuff_documents_chain(chatModel, prompt)
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-
+    chat_model = ChatOpenAI(
+        base_url=settings.llm_base_url,
+        model=settings.llm_model,
+        temperature=0.2,
+        top_p=0.7,
+        max_tokens=4096,
+    )
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            ("human", "{input}"),
+        ]
+    )
+    question_answer_chain = create_stuff_documents_chain(chat_model, prompt)
+    return create_retrieval_chain(retriever, question_answer_chain)
 
 
 @app.route("/")
 def index():
-    return render_template('chat.html')
+    return render_template("chat.html")
 
 
+@app.route("/healthz")
+def healthz():
+    return jsonify({"status": "ok", "service": "medical-chatbot"})
 
-@app.route("/get", methods=["GET", "POST"])
+
+@app.route("/get", methods=["POST"])
 def chat():
-    msg = request.form["msg"]
-    input = msg
-    print(input)
-    response = rag_chain.invoke({"input": msg})
-    print("Response : ", response["answer"])
-    return str(response["answer"])
+    msg = request.form.get("msg", "").strip()
+    if not msg:
+        return "Please enter a medical question so I can help.", 400
+
+    try:
+        response = get_rag_chain().invoke({"input": msg})
+    except Exception:  # pragma: no cover - defensive runtime guard for hosted envs
+        app.logger.exception("RAG chain failed")
+        return (
+            "I’m having trouble connecting to the medical knowledge base right now. "
+            "Please verify the Qdrant URL, collection, and API keys in your Render environment."
+        ), 503
+
+    return str(response.get("answer", "I could not generate an answer for that question."))
 
 
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port= 5000, debug= True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "5000"))
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    app.run(host="0.0.0.0", port=port, debug=debug)
