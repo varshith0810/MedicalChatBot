@@ -20,7 +20,7 @@ DEFAULT_CHUNK_SIZE = 500
 DEFAULT_CHUNK_OVERLAP = 50
 DEFAULT_RETRIEVAL_K = 3
 DEFAULT_LLM_BASE_URL = "https://integrate.api.nvidia.com/v1"
-DEFAULT_LLM_MODEL = "writer/palmyra-med-70b-32k"
+DEFAULT_LLM_MODEL = "nvidia/llama-3.3-nemotron-super-49b-v1.5"
 
 
 @dataclass(frozen=True)

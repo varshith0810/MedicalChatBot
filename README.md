@@ -21,6 +21,8 @@ cp .env.example .env
 
 Update `.env` with your model/API settings. For the included NVIDIA-hosted model, set `NVIDIA_API_KEY`.
 
+The default NVIDIA LLM is now `nvidia/llama-3.3-nemotron-super-49b-v1.5`, a newer Nemotron chat/reasoning model that is better suited for RAG-style medical-book Q&A than the previous Palmyra default.
+
 ## Start Qdrant locally
 
 ```bash

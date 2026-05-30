@@ -7,8 +7,10 @@ This guide deploys the Flask chat app on Render and uses a managed Qdrant endpoi
 - A GitHub or GitLab repository containing this project.
 - A Qdrant Cloud cluster or another public HTTPS Qdrant URL.
 - The Qdrant API key if your Qdrant endpoint requires authentication.
-- A NVIDIA API key for the configured `writer/palmyra-med-70b-32k` model, or update `LLM_BASE_URL` and `LLM_MODEL` for your provider.
+- A NVIDIA API key for the configured `nvidia/llama-3.3-nemotron-super-49b-v1.5` model, or update `LLM_BASE_URL` and `LLM_MODEL` for your provider.
 - PDFs available locally for ingestion.
+
+The default LLM was changed from the older Palmyra medical model to `nvidia/llama-3.3-nemotron-super-49b-v1.5` because NVIDIA lists it in the current NIM LLM catalog and it is a newer general-purpose Nemotron model suitable for chat, reasoning, instruction following, and RAG responses.
 
 ## 1. Prepare the repository
 
@@ -117,7 +119,7 @@ Add these environment variables in the Render service settings:
 | `CHUNK_OVERLAP` | `50` |
 | `RETRIEVAL_K` | `3` |
 | `LLM_BASE_URL` | `https://integrate.api.nvidia.com/v1` |
-| `LLM_MODEL` | `writer/palmyra-med-70b-32k` |
+| `LLM_MODEL` | `nvidia/llama-3.3-nemotron-super-49b-v1.5` |
 | `NVIDIA_API_KEY` | Your NVIDIA API key |
 
 ## 7. Verify the deployed app

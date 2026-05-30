@@ -32,6 +32,6 @@ services:
       - key: LLM_BASE_URL
         value: https://integrate.api.nvidia.com/v1
       - key: LLM_MODEL
-        value: writer/palmyra-med-70b-32k
+        value: nvidia/llama-3.3-nemotron-super-49b-v1.5
       - key: NVIDIA_API_KEY
         sync: false
