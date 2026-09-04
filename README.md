@@ -1,6 +1,6 @@
 # MediMind
 
-MedicalChatBot is a Flask-based retrieval-augmented generation (RAG) assistant for medical books. The current build uses:
+MediMind is a retrieval-augmented generation (RAG) based assistant for medical books. The current build uses:
 
 - **Qdrant** for vector search
 - **SQLite + FTS5** for book/chunk metadata and text search
